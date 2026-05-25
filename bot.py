@@ -105,25 +105,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<i>Просто введите команду ниже или воспользуйтесь кнопками:</i>"
     )
     
-    if update.message:
-        await update.message.reply_text(
-            text,
-            reply_markup=main_menu(),
-            parse_mode=ParseMode.HTML
-        )
-    else:
-        query = update.callback_query
-        await query.edit_message_text(
-            text,
-            reply_markup=main_menu(),
-            parse_mode=ParseMode.HTML
-        )
+    if update.callback_query:
+        await update.callback_query.edit_message_text(text, reply_markup=main_menu(), parse_mode=ParseMode.HTML)
+        return
+
+    message = update.effective_message
+    if message:
+        await message.reply_text(text, reply_markup=main_menu(), parse_mode=ParseMode.HTML)
 
 
 
 
 async def idea(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = update.message or update.channel_post
+    message = update.effective_message
     user = update.effective_user
     
     if not message:
@@ -200,15 +194,14 @@ async def idea(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def my_ideas(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = update.message or (update.callback_query.message if update.callback_query else None)
-    
+    message = update.effective_message
     if not message:
         return
     
     if update.callback_query:
         await update.callback_query.answer()
     
-    user_id = update.effective_user.id
+    user_id = update.effective_user.id if update.effective_user else update.effective_chat.id
     ideas_data = load_ideas()
     user_ideas = [idea for idea in ideas_data if idea["user_id"] == user_id]
     
@@ -288,7 +281,7 @@ async def all_ideas(update: Update, context: ContextTypes.DEFAULT_TYPE):
                              parse_mode=ParseMode.HTML, reply_markup=back_menu())
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = update.message or (update.callback_query.message if update.callback_query else None)
+    message = update.effective_message
     
     if not message:
         return
@@ -499,11 +492,11 @@ def main():
     app = Application.builder().token(TOKEN).build()
     
     # Handlers for messages and channel posts
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("idea", idea))
-    app.add_handler(CommandHandler("my_ideas", my_ideas))
-    app.add_handler(CommandHandler("all_ideas", all_ideas))
-    app.add_handler(CommandHandler("help", help_command))
+    app.add_handler(CommandHandler("start", start, filters=filters.ALL))
+    app.add_handler(CommandHandler("idea", idea, filters=filters.ALL))
+    app.add_handler(CommandHandler("my_ideas", my_ideas, filters=filters.ALL))
+    app.add_handler(CommandHandler("all_ideas", all_ideas, filters=filters.ALL))
+    app.add_handler(CommandHandler("help", help_command, filters=filters.ALL))
     
     # Callback for buttons
     app.add_handler(CallbackQueryHandler(button_handler))
