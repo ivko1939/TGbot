@@ -11,7 +11,7 @@ import uuid
 # CONFIG
 # =========================
 
-TOKEN = "8922980124:AAFhyEs-anNSp9LBaDr6OhcG-iTnbOqBDT0" #112
+TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = 5469826586
 IDEAS_FILE = "ideas.json"
 
