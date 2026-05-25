@@ -11,7 +11,7 @@ import uuid
 # CONFIG
 # =========================
 
-TOKEN = "8843789584:AAEhxbo27a-csMnVaXXobZpiAbpNUehrTtk" #112
+TOKEN = "8922980124:AAFhyEs-anNSp9LBaDr6OhcG-iTnbOqBDT0" #112
 ADMIN_ID = 5469826586
 IDEAS_FILE = "ideas.json"
 
